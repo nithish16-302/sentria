@@ -11,8 +11,12 @@ RUN npm install -g @angular/cli@17.3.0
 COPY package*.json ./
 
 # Install all dependencies (including dev dependencies for build)
-# Use npm install instead of npm ci since package-lock.json might not exist
-RUN npm install --no-audit --no-fund
+# Check if package-lock.json exists and use appropriate install command
+RUN if [ -f "package-lock.json" ]; then \
+        echo "Using npm ci with existing package-lock.json" && npm ci; \
+    else \
+        echo "No package-lock.json found, using npm install" && npm install --no-audit --no-fund; \
+    fi
 
 # Copy source code
 COPY . .
