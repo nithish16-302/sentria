@@ -1,35 +1,23 @@
-# Use Node.js 18 as the base image for building
-FROM node:18-alpine as build
+# Use Node.js 18 for building
+FROM node:18-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Install Angular CLI globally
-RUN npm install -g @angular/cli@17.3.0
+# Copy all files
+COPY . .
 
-# Copy all source code (ensure we get everything)
-COPY . ./
+# Install dependencies with minimal flags
+RUN npm install
 
-# List files to debug (remove this line once working)
-RUN ls -la
+# Build the app
+RUN npm run build
 
-# Install all dependencies (including dev dependencies for build)
-RUN npm install --no-audit --no-fund --verbose
+# Install serve globally to serve the built app
+RUN npm install -g serve
 
-# Build the Angular app for production
-RUN npm run build -- --configuration=production
-
-# Use nginx to serve the built app
-FROM nginx:alpine
-
-# Copy the built app from the build stage
-COPY --from=build /app/dist/retail-analytics-ui /usr/share/nginx/html
-
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Expose port 80 (standard for web services)
+# Expose port
 EXPOSE 80
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Serve the built files
+CMD ["serve", "-s", "dist/retail-analytics-ui", "-l", "80"]
