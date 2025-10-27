@@ -5,13 +5,7 @@ echo "🎨 Building Angular Frontend for Render..."
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-if [ -f "package-lock.json" ]; then
-    echo "Found package-lock.json, using npm ci..."
-    npm ci
-else
-    echo "No package-lock.json found, using npm install..."
-    npm install --no-audit --no-fund
-fi
+npm install --no-audit --no-fund
 
 # Build for production
 echo "🔨 Building Angular app for production..."

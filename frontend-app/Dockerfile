@@ -7,16 +7,11 @@ WORKDIR /app
 # Install Angular CLI globally
 RUN npm install -g @angular/cli@17.3.0
 
-# Copy package files first for better caching
-COPY package*.json ./
+# Copy package.json file for dependency installation
+COPY package.json ./
 
 # Install all dependencies (including dev dependencies for build)
-# Check if package-lock.json exists and use appropriate install command
-RUN if [ -f "package-lock.json" ]; then \
-        echo "Using npm ci with existing package-lock.json" && npm ci; \
-    else \
-        echo "No package-lock.json found, using npm install" && npm install --no-audit --no-fund; \
-    fi
+RUN npm install --no-audit --no-fund
 
 # Copy source code
 COPY . .
