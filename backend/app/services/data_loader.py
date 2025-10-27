@@ -3,8 +3,8 @@ from pathlib import Path
 from functools import lru_cache
 
 BASE_DIR = Path(__file__).resolve().parents[3]
-SALES_CSV = BASE_DIR / 'synthetic_us_retail_apparel_sales.csv'
-SENTIMENT_CSV = BASE_DIR / 'social_media_sentiment_ads_10000.csv'
+SALES_CSV = 'https://github.com/nithish16-302/sentria/blob/master/backend/synthetic_us_retail_apparel_sales.csv'
+SENTIMENT_CSV = 'https://github.com/nithish16-302/sentria/blob/master/backend/social_media_sentiment_ads_10000.csv'
 
 @lru_cache(maxsize=1)
 def load_sales():
