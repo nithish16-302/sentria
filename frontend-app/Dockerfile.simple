@@ -4,17 +4,23 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy package.json
-COPY package.json ./
-
-# Install dependencies with basic settings
-RUN npm install --production=false
-
-# Copy source code
+# Copy all files first
 COPY . .
+
+# Debug: List files to see what was copied
+RUN ls -la
+
+# Debug: Check if package.json exists
+RUN test -f package.json && echo "package.json found" || echo "package.json NOT found"
+
+# Install dependencies
+RUN npm install
 
 # Build the app
 RUN npm run build
+
+# Debug: Check if build output exists
+RUN ls -la dist/ || echo "dist directory not found"
 
 # Install serve to run the app
 RUN npm install -g serve
