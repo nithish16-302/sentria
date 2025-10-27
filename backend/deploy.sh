@@ -5,7 +5,14 @@ echo "🚀 Building Retail Analytics Backend..."
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-pip install -r requirements.txt
+# Upgrade pip first
+pip install --upgrade pip
+
+# Install wheel and setuptools for better compatibility
+pip install wheel setuptools
+
+# Install dependencies with compatibility flags
+pip install -r requirements.txt --no-cache-dir --prefer-binary
 
 # Run the application locally
 echo "🏃 Starting backend server..."
