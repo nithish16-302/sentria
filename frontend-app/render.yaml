@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: sentria-frontend
+    env: docker
+    region: oregon
+    plan: free  # Change to starter or standard for production
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_URL
+        value: https://sentria-ui.onrender.com  # Update with your backend URL
+    autoDeploy: false  # Set to true for auto-deploy on git push
+    
+    # Health check
+    healthCheckPath: /
