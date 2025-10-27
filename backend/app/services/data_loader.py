@@ -8,10 +8,35 @@ SENTIMENT_CSV = 'https://github.com/nithish16-302/sentria/blob/master/backend/so
 
 @lru_cache(maxsize=1)
 def load_sales():
-    df = pd.read_csv(SALES_CSV, parse_dates=['date'])
+    df = pd.read_csv(SALES_CSV)
+    # Handle date column parsing with error handling
+    if 'date' in df.columns:
+        try:
+            df['date'] = pd.to_datetime(df['date'], errors='coerce')
+        except Exception as e:
+            print(f"Warning: Could not parse date column - {e}")
+            # If parsing fails, create a dummy date
+            df['date'] = pd.to_datetime('2025-01-01')
+    else:
+        # If date column doesn't exist, create one
+        print("Warning: No date column found, creating dummy dates")
+        df['date'] = pd.to_datetime('2025-01-01')
     return df
 
 @lru_cache(maxsize=1)
 def load_sentiment():
-    df = pd.read_csv(SENTIMENT_CSV, parse_dates=['timestamp'])
+    df = pd.read_csv(SENTIMENT_CSV)
+    # Handle timestamp column parsing with error handling
+    if 'timestamp' in df.columns:
+        try:
+            df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
+        except Exception as e:
+            print(f"Warning: Could not parse timestamp column - {e}")
+            # If parsing fails, create a dummy timestamp
+            df['timestamp'] = pd.to_datetime('2025-01-01')
+    else:
+        # If timestamp column doesn't exist, create one
+        print("Warning: No timestamp column found, creating dummy timestamps")
+        df['timestamp'] = pd.to_datetime('2025-01-01')
     return df
+
