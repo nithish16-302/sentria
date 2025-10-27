@@ -11,7 +11,8 @@ RUN npm install -g @angular/cli@17.3.0
 COPY package*.json ./
 
 # Install all dependencies (including dev dependencies for build)
-RUN npm ci
+# Use npm install instead of npm ci since package-lock.json might not exist
+RUN npm install --no-audit --no-fund
 
 # Copy source code
 COPY . .
