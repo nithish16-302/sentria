@@ -7,14 +7,14 @@ WORKDIR /app
 # Install Angular CLI globally
 RUN npm install -g @angular/cli@17.3.0
 
-# Copy package.json file for dependency installation
-COPY package.json ./
+# Copy all source code (ensure we get everything)
+COPY . ./
+
+# List files to debug (remove this line once working)
+RUN ls -la
 
 # Install all dependencies (including dev dependencies for build)
-RUN npm install --no-audit --no-fund
-
-# Copy source code
-COPY . .
+RUN npm install --no-audit --no-fund --verbose
 
 # Build the Angular app for production
 RUN npm run build -- --configuration=production
@@ -22,22 +22,14 @@ RUN npm run build -- --configuration=production
 # Use nginx to serve the built app
 FROM nginx:alpine
 
-# Install gettext for envsubst (environment variable substitution)
-RUN apk add --no-cache gettext
-
 # Copy the built app from the build stage
 COPY --from=build /app/dist/retail-analytics-ui /usr/share/nginx/html
 
-# Copy nginx configuration template
+# Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Create a simple startup script for environment variable handling
-RUN echo '#!/bin/sh' > /docker-entrypoint.sh && \
-    echo 'nginx -g "daemon off;"' >> /docker-entrypoint.sh && \
-    chmod +x /docker-entrypoint.sh
+# Expose port 80 (standard for web services)
+EXPOSE 80
 
-# Expose port (Render will provide the PORT environment variable)
-EXPOSE $PORT
-
-# Start nginx with the startup script
-CMD ["/docker-entrypoint.sh"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
