@@ -1,0 +1,34 @@
+/* Global Styles */
+:root {
+  --bg:#f6f8fa;
+  --card-bg:#ffffff;
+  --accent:#1565c0;
+  --accent-alt:#0d47a1;
+  --radius:14px;
+}
+html, body { height:100%; }
+body { margin:0; font-family: system-ui, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; background:var(--bg); color:#1f2933; }
+* { box-sizing:border-box; }
+
+/* Utility classes */
+.flex { display:flex; }
+.grid { display:grid; }
+.shadow { box-shadow:0 6px 24px -4px rgba(0,0,0,.08); }
+
+/* Animations */
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:translateY(0);} }
+[ng-version] .card, [ng-version] .panel { animation:fadeIn .45s ease both; }
+
+/* Chart containers */
+.chart { 
+  width: 100%; 
+  height: 360px; 
+  min-height: 360px;
+  position: relative;
+}
+
+/* Ensure charts render properly */
+.chart > div {
+  width: 100% !important;
+  height: 100% !important;
+}
