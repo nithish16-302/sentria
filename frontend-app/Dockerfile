@@ -4,8 +4,20 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy package files first (for better Docker layer caching)
-COPY package.json ./
+# Copy all files (package.json should be included)
+COPY . .
+
+# Debug: Check if package.json exists
+RUN echo "=== CHECKING FILES ===" && \
+    ls -la && \
+    if [ ! -f package.json ]; then \
+        echo "❌ package.json not found, listing all JSON files:" && \
+        find . -name "*.json" -type f || echo "No JSON files found" && \
+        exit 1; \
+    else \
+        echo "✅ package.json found"; \
+    fi
+
 
 # Install dependencies (npm install will work without package-lock.json)
 RUN npm install --no-audit --no-fund
