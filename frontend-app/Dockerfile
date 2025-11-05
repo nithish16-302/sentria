@@ -5,10 +5,10 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Copy package files first (for better Docker layer caching)
-COPY package.json package-lock.json ./
+COPY package.json ./
 
-# Install dependencies
-RUN npm ci --only=production=false
+# Install dependencies (npm install will work without package-lock.json)
+RUN npm install --no-audit --no-fund
 
 # Copy source code
 COPY . .
