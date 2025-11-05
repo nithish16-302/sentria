@@ -4,7 +4,7 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy package files first (for better Docker layer caching)
+# Copy package files
 COPY package.json package-lock.json ./
 
 # Install dependencies
@@ -16,25 +16,22 @@ COPY . .
 # Build the Angular app
 RUN npm run build -- --configuration=production --output-path=dist/retail-analytics-ui
 
-# Verify build was successful
+# Verify build
 RUN if [ ! -f "dist/retail-analytics-ui/index.html" ]; then \
-        echo "❌ BUILD FAILED - No index.html found in dist/retail-analytics-ui/"; \
-        ls -la dist/ || echo "No dist directory"; \
+        echo "❌ BUILD FAILED - No index.html found"; \
         exit 1; \
     else \
-        echo "✅ Build successful - Angular app ready"; \
-        echo "Files created:"; \
+        echo "✅ Build successful"; \
         ls -la dist/retail-analytics-ui/; \
     fi
 
 # Install serve globally
 RUN npm install -g serve
 
-# Create startup script for dynamic port handling
+# Create startup script
 RUN echo '#!/bin/sh' > /start.sh && \
     echo 'PORT=${PORT:-3000}' >> /start.sh && \
     echo 'echo "🚀 Starting Angular app on port $PORT"' >> /start.sh && \
-    echo 'echo "Serving from: dist/retail-analytics-ui/"' >> /start.sh && \
     echo 'serve -s dist/retail-analytics-ui -l $PORT' >> /start.sh && \
     chmod +x /start.sh
 
