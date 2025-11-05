@@ -42,8 +42,8 @@ coverage
 .gitignore
 
 # Docker
-Dockerfile
-.dockerignore
+# Dockerfile
+# .dockerignore
 
 # Other
 README.md

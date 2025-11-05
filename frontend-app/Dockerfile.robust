@@ -1,0 +1,41 @@
+# Robust Dockerfile for Angular frontend
+FROM node:18-alpine
+
+# Add necessary system packages
+RUN apk add --no-cache git
+
+# Set working directory
+WORKDIR /app
+
+# First, try to copy package.json specifically
+# If this fails, it means the build context doesn't include it
+COPY package*.json ./
+
+# Verify package.json exists and show its content
+RUN echo "=== package.json content ===" && cat package.json
+
+# Set npm configurations for reliability
+RUN npm config set registry https://registry.npmjs.org/
+RUN npm config set fetch-timeout 600000
+RUN npm config set fetch-retry-mintimeout 10000
+RUN npm config set fetch-retry-maxtimeout 60000
+
+# Install dependencies with error handling
+RUN npm install --no-audit --no-fund --legacy-peer-deps || \
+    npm install --no-audit --no-fund || \
+    npm install
+
+# Copy the rest of the application
+COPY . .
+
+# Build the Angular application
+RUN npm run build -- --configuration=production
+
+# Install serve to serve the built app
+RUN npm install -g serve
+
+# Expose port
+EXPOSE 80
+
+# Serve the application
+CMD ["serve", "-s", "dist/retail-analytics-ui", "-l", "80"]
