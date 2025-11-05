@@ -30,13 +30,35 @@ RUN if [ ! -f package.json ]; then \
 RUN npm install --no-audit --no-fund
 
 # Build the app
-RUN npm run build
+RUN npm run build -- --configuration=production
+
+# Debug: Check if build was successful
+RUN echo "=== BUILD OUTPUT DEBUG ===" && \
+    ls -la dist/ || echo "No dist directory found" && \
+    ls -la dist/retail-analytics-ui/ || echo "No retail-analytics-ui directory in dist" && \
+    find dist/ -name "index.html" -type f || echo "No index.html found in dist"
 
 # Install serve globally to serve the built app
 RUN npm install -g serve
 
-# Expose port
-EXPOSE 80
+# Expose port (Render uses dynamic ports)
+EXPOSE $PORT
 
-# Serve the built files
-CMD ["serve", "-s", "dist/retail-analytics-ui", "-l", "80"]
+# Create startup script to handle dynamic port
+RUN echo '#!/bin/sh' > /start.sh && \
+    echo 'PORT=${PORT:-80}' >> /start.sh && \
+    echo 'echo "Starting server on port $PORT"' >> /start.sh && \
+    echo 'if [ -d "dist/retail-analytics-ui" ]; then' >> /start.sh && \
+    echo '  echo "Serving from dist/retail-analytics-ui"' >> /start.sh && \
+    echo '  serve -s dist/retail-analytics-ui -l $PORT' >> /start.sh && \
+    echo 'elif [ -d "dist" ]; then' >> /start.sh && \
+    echo '  echo "Serving from dist"' >> /start.sh && \
+    echo '  serve -s dist -l $PORT' >> /start.sh && \
+    echo 'else' >> /start.sh && \
+    echo '  echo "No dist directory found, serving current directory"' >> /start.sh && \
+    echo '  serve -s . -l $PORT' >> /start.sh && \
+    echo 'fi' >> /start.sh && \
+    chmod +x /start.sh
+
+# Use the startup script
+CMD ["/start.sh"]
