@@ -47,16 +47,30 @@ EXPOSE $PORT
 # Create startup script to handle dynamic port
 RUN echo '#!/bin/sh' > /start.sh && \
     echo 'PORT=${PORT:-80}' >> /start.sh && \
-    echo 'echo "Starting server on port $PORT"' >> /start.sh && \
-    echo 'if [ -d "dist/retail-analytics-ui" ]; then' >> /start.sh && \
-    echo '  echo "Serving from dist/retail-analytics-ui"' >> /start.sh && \
-    echo '  serve -s dist/retail-analytics-ui -l $PORT' >> /start.sh && \
-    echo 'elif [ -d "dist" ]; then' >> /start.sh && \
-    echo '  echo "Serving from dist"' >> /start.sh && \
-    echo '  serve -s dist -l $PORT' >> /start.sh && \
+    echo 'echo "=== STARTUP DEBUG ==="' >> /start.sh && \
+    echo 'echo "Starting server on 0.0.0.0:$PORT"' >> /start.sh && \
+    echo 'echo "Current directory contents:"' >> /start.sh && \
+    echo 'ls -la' >> /start.sh && \
+    echo 'echo "Dist directory contents:"' >> /start.sh && \
+    echo 'ls -la dist/ 2>/dev/null || echo "No dist directory"' >> /start.sh && \
+    echo 'echo "Retail analytics directory:"' >> /start.sh && \
+    echo 'ls -la dist/retail-analytics-ui/ 2>/dev/null || echo "No retail-analytics-ui directory"' >> /start.sh && \
+    echo 'if [ -d "dist/retail-analytics-ui" ] && [ -f "dist/retail-analytics-ui/index.html" ]; then' >> /start.sh && \
+    echo '  echo "✅ Serving Angular app from dist/retail-analytics-ui"' >> /start.sh && \
+    echo '  serve -s dist/retail-analytics-ui -p $PORT --host 0.0.0.0 --single' >> /start.sh && \
+    echo 'elif [ -d "dist" ] && [ -f "dist/index.html" ]; then' >> /start.sh && \
+    echo '  echo "✅ Serving from dist"' >> /start.sh && \
+    echo '  serve -s dist -p $PORT --host 0.0.0.0 --single' >> /start.sh && \
     echo 'else' >> /start.sh && \
-    echo '  echo "No dist directory found, serving current directory"' >> /start.sh && \
-    echo '  serve -s . -l $PORT' >> /start.sh && \
+    echo '  echo "❌ No valid Angular build found!"' >> /start.sh && \
+    echo '  echo "Creating fallback HTML page..."' >> /start.sh && \
+    echo '  mkdir -p /tmp/app' >> /start.sh && \
+    echo '  cat > /tmp/app/index.html << EOF' >> /start.sh && \
+    echo '<!DOCTYPE html>' >> /start.sh && \
+    echo '<html><head><title>Frontend App Error</title></head>' >> /start.sh && \
+    echo '<body><h1>Build Error</h1><p>Angular build failed. Check logs.</p></body></html>' >> /start.sh && \
+    echo 'EOF' >> /start.sh && \
+    echo '  serve -s /tmp/app -p $PORT --host 0.0.0.0' >> /start.sh && \
     echo 'fi' >> /start.sh && \
     chmod +x /start.sh
 
